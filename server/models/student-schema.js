@@ -105,24 +105,54 @@ const studentSchema = new mongoose.Schema({
 //   });
 
 
-  studentSchema.pre('save', async function (next) {
-    if (!this.isNew) {
+//   studentSchema.pre('save', async function (next) {
+//     if (!this.isNew) {
+//         return next();
+//     }
+
+//     try {
+//         const currentDate = new Date().getFullYear().toString();
+//         const idPrefix = '01-2122-';
+//         const paddingLength = 6;
+//         const count = await this.model('studentInfo').countDocuments().exec();
+//         const incrementedCount = count + 1;
+//         const paddedCount = incrementedCount.toString().padStart(paddingLength, '0');
+//         this.studentId = idPrefix + paddedCount;
+//         next();
+//     } catch (error) {
+//         next(error);
+//     }
+// });
+
+
+studentSchema.pre('save', async function (next) {
+    if (!this.isNew || this.studentId) {
         return next();
     }
 
     try {
-        const currentDate = new Date().getFullYear().toString();
         const idPrefix = '01-2122-';
         const paddingLength = 6;
-        const count = await this.model('studentInfo').countDocuments().exec();
-        const incrementedCount = count + 1;
-        const paddedCount = incrementedCount.toString().padStart(paddingLength, '0');
-        this.studentId = idPrefix + paddedCount;
+        const lastStudent = await this.model('studentInfo')
+            .findOne({}, {}, { sort: { studentId: -1 } })
+            .exec();
+
+        if (lastStudent) {
+            const lastStudentId = lastStudent.studentId;
+            const lastSequenceNumber = parseInt(lastStudentId.substr(-paddingLength));
+            const newSequenceNumber = lastSequenceNumber + 1;
+            const paddedCount = newSequenceNumber.toString().padStart(paddingLength, '0');
+            this.studentId = idPrefix + paddedCount;
+        } else {
+            this.studentId = idPrefix + '000001';
+        }
+
         next();
     } catch (error) {
         next(error);
     }
 });
+
 
 
 
