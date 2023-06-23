@@ -1,0 +1,102 @@
+
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 20px;
+}
+
+h2 {
+    text-align: center;
+    margin-top: 20px;
+}
+
+#student-info-stored {
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 20px;
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#student-info-stored h3 {
+    margin: 0;
+}
+
+#student-id {
+    margin: 10px 0;
+}
+
+#personal-data {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin-top: 10px;
+}
+
+#personal-data p {
+    margin: 5px 0;
+}
+
+#personal-data-2 {
+    margin-top: 10px;
+}
+
+input[type="radio"],
+input[type="text"],
+button {
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+}
+
+input[type="text"] {
+    width: 100%;
+}
+
+input[type="radio"] {
+    margin-right: 5px;
+}
+
+#buttons {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 20px;
+}
+
+#buttons .updatebtn {
+    padding: 10px 20px;
+    background-color: #4caf50;
+    color: #fff;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+#buttons .updatebtn:hover {
+    background-color: #45a049;
+}
+
+button {
+    padding: 10px 20px;
+    background-color: #ff0000;
+    color: #fff;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #cc0000;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+a i {
+    font-size: 24px;
+    color: #000;
+}

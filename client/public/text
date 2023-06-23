@@ -1,0 +1,147 @@
+<h2>Search Students</h2>
+<form id="searchForm">
+  <label for="searchQuery">Search:</label>
+  <input type="text" id="searchQuery" placeholder="Enter student ID or name"><br>
+  <button type="submit">Search</button>
+</form>
+
+
+// Function to handle form submission for searching students
+document.getElementById('searchForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+
+  const searchQuery = document.getElementById('searchQuery').value;
+
+  const params = new URLSearchParams({
+    query: searchQuery
+  }).toString();
+
+  const url = `/student/info/search?${params}`;
+
+  const result = await makeRequest(url, 'GET');
+  console.log(result); // Do something with the response
+});
+
+
+
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Student Information</title>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+<body>
+  <h1>Student Information</h1>
+
+  <h2>Create Student</h2>
+  <form id="createForm">
+    <label for="firstName">First Name:</label>
+    <input type="text" id="firstName" required><br>
+
+    <label for="lastName">Last Name:</label>
+    <input type="text" id="lastName" required><br>
+
+    <label for="studentId">Student ID:</label>
+    <input type="text" id="studentId" required><br>
+
+    <button type="submit">Create</button>
+  </form>
+
+  <h2>Search Students</h2>
+  <form id="searchForm">
+    <label for="name">Name:</label>
+    <input type="text" id="name"><br>
+
+    <label for="studentId">Student ID:</label>
+    <input type="text" id="searchStudentId"><br>
+
+    <button type="submit">Search</button>
+  </form>
+
+  <h2>All Students</h2>
+  <div id="studentsList"></div>
+
+  <script>
+    // Function to make an API request using Axios
+    async function makeRequest(url, method, data = null) {
+      try {
+        const response = await axios({
+          method,
+          url,
+          data
+        });
+
+        return response.data;
+      } catch (error) {
+        console.log(error);
+      }
+    }
+
+    // Function to handle form submission for creating a student
+    document.getElementById('createForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const firstName = document.getElementById('firstName').value;
+      const lastName = document.getElementById('lastName').value;
+      const studentId = document.getElementById('studentId').value;
+
+      const data = {
+        name: [
+          {
+            firstName,
+            lastName
+          }
+        ],
+        studentId
+      };
+
+      const result = await makeRequest('/student/info/enroll', 'POST', data);
+      console.log(result); // Do something with the response
+    });
+
+    // Function to handle form submission for searching students
+    document.getElementById('searchForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const name = document.getElementById('name').value;
+      const studentId = document.getElementById('searchStudentId').value;
+
+      const params = new URLSearchParams({
+        name,
+        studentId
+      }).toString();
+
+      const url = `/student/info/search?${params}`;
+
+      const result = await makeRequest(url, 'GET');
+      console.log(result); // Do something with the response
+    });
+
+    // Function to fetch and display all students
+    async function fetchAllStudents() {
+      const result = await makeRequest('/student/info', 'GET');
+      const studentsList = document.getElementById('studentsList');
+
+      studentsList.innerHTML = '';
+
+      result.allStudentInfo.forEach(student => {
+        const firstName = student.name[0].firstName;
+        const lastName = student.name[0].lastName;
+        const studentId = student.studentId;
+
+        const studentItem = document.createElement('div');
+        studentItem.innerHTML = `
+          <h3>${firstName} ${lastName}</h3>
+          <p>Student ID: ${studentId}</p>
+        `;
+
+        studentsList.appendChild(studentItem);
+      });
+    }
+
+    // Fetch and display all students when the page loads
+    fetchAllStudents();
+  </script>
+</body>
+</html>

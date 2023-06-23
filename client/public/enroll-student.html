@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enroll Student</title>
+    <link rel="stylesheet" href="./enroll-student.css">
+</head>
+<body>
+    <h1>Update Information</h1>
+    <div id="enrollSuccessModal" class="modal">
+        <div class="modal-content">
+            <h3>Student Enrolled Successfully!</h3>
+        </div>
+    </div>
+    <div>
+      <form id="createForm">
+        <label for="firstName">First Name:</label>
+        <input type="text" id="firstName" required>
+        <label for="middleName">Middle Name:</label>
+        <input type="text" id="middleName" required>
+        <label for="lastName">Last Name:</label>
+        <input type="text" id="lastName" required>
+        <label for="course">Course:</label>
+        <input type="text" id="course" required>
+        <label for="yearLevel">Year Level:</label>
+        <input type="text" id="yearLevel" required>
+        <label for="classification">Classification:</label>
+        <input type="text" id="classification" required>
+        <label for="dateOfBirth">Date of Birth:</label>
+        <input type="text" id="dateOfBirth" required>
+        <label for="placeOfBirth">Place of Birth:</label>
+        <input type="text" id="placeOfBirth" required>
+        <label for="age">Age:</label>
+        <input type="text" id="age" required>
+        <h5>Gender</h5>
+        <div id="gender">
+          <input type="radio" id="female" name="gender" value="female" required>
+          <label for="female">Female</label>
+          <input type="radio" id="male" name="gender" value="male" required>
+          <label for="male">Male</label>
+        </div>
+        <button type="submit">Enroll</button>
+      </form>
+      <a href="./index.html"><button>Return</button></a>
+    </div>
+
+    <script>
+        async function makeRequest(url, method, data = null) {
+            try {
+                const options = {
+                    method,
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                };
+
+                if (data) {
+                    options.body = JSON.stringify(data);
+                }
+
+                const response = await fetch(url, options);
+                if (!response.ok) {
+                    throw new Error('Request failed');
+                }
+
+                const responseData = await response.json();
+                return responseData;
+            } catch (error) {
+                console.log(error);
+            }
+        }
+
+        const createForm = document.getElementById('createForm');
+        createForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const firstName = document.getElementById('firstName').value;
+            const middleName = document.getElementById('middleName').value;
+            const lastName = document.getElementById('lastName').value;
+            const course = document.getElementById('course').value;
+            const yearLevel = document.getElementById('yearLevel').value;
+            const classification = document.getElementById('classification').value;
+            const dateOfBirth = document.getElementById('dateOfBirth').value;
+            const placeOfBirth = document.getElementById('placeOfBirth').value;
+            const age = document.getElementById('age').value;
+            const gender = document.querySelector('input[name="gender"]:checked').value;
+
+            const data = {
+                name: {
+                    firstName,
+                    middleName,
+                    lastName
+                },
+                course,
+                yearLevel,
+                classification,
+                dateOfBirth,
+                placeOfBirth,
+                age,
+                gender
+            };
+
+            try {
+                const result = await makeRequest('/student/info/enroll', 'POST', data);
+                console.log(result);
+
+                    
+                //display modal
+                const modal = document.getElementById('enrollSuccessModal');
+                modal.style.display = 'block';
+
+                //wait 1.5 secs
+                setTimeout(() => {
+                    modal.style.display = 'none';
+                    window.location.replace('index.html')
+                }, 1500)
+                // Process the response as needed
+            } catch (error) {
+                console.log(error);
+                // Handle the error appropriately
+            }
+
+           
+        });
+
+
+
+    </script>
+</body>
+</html>

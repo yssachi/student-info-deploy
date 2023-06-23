@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Information | Homepage</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+<body>
+    <style>
+        h1 {
+            margin: 0;
+            padding: 0;
+            text-align: center;
+            font-family: Impact;
+        }
+
+        h2 {
+            font-family: Arial, Helvetica, sans-serif;
+            margin-left: 30px;
+        }
+
+        form {
+            margin-bottom: 20px;
+        }
+
+        
+        .searching {
+            width: 360px;
+            position: relative;
+        }
+
+        input[type="text"]{
+            padding: 7px 7px 7px 15px;
+            font-size: 16px;
+            width: 300px;
+            outline: none;
+            border-top-left-radius: 30px;
+            border-bottom-left-radius: 30px;
+            border: solid 1px;
+            border-color: cadetblue;
+        }
+
+        .btn-search {
+            padding: 7px;
+            font-size: 16px;
+            position: absolute;
+            right: 0;
+            border-top-right-radius: 30px;
+            border-bottom-right-radius: 30px;
+            border: solid 1px;
+            border-color: cadetblue;
+            background-color: cadetblue;
+            cursor: pointer;
+        }
+
+        .btn-enroll {
+            background-color: cadetblue;
+            border: solid 1px;
+            border-color: transparent;
+            padding: 10px 30px;
+            border-radius: 30px;
+            cursor: pointer;
+        }
+
+
+        .student-item {
+            background-color: cadetblue;
+            padding: 10px;
+            margin-bottom: 30px;
+            margin-left: 20px;
+            border-radius: 5px;
+            display: inline-block;
+            width: 300px;
+        }
+        .student-item h3 {
+            margin: 0;
+            font-size: 18px;
+        }
+
+        .student-item p {
+            margin-top: 5px;
+            font-size: 14px;
+        }
+
+
+
+
+    </style>
+   
+    <h1>Student Information</h1>
+
+    <!--This section is for creating a form | example when student enrolled-->
+    
+
+    <!--This section is for searching a specific student-->
+    <h2>Search Students</h2>
+    <form action="" id="searchForm">
+        <div class="searching">
+            <input type="text" id="name" placeholder="Search Student Name">
+            <button type="submit" class="btn-search">Search</button>
+        </div>
+    </form>
+    <button class="btn-enroll">Enroll Student</button>
+
+    <h2>Student List</h2>
+    <div id="studentList"></div>
+
+    <script>
+        // 1. first thing to do is to set up the axios
+        // ==> create a function to make an API request from the server using the Axios
+
+        async function makeRequest(url, method, data = null){
+            try {
+                const response = await axios({
+                    method,
+                    url,
+                    data
+                });
+
+                return response.data;
+            } catch (error) {
+                console.log(error);
+            }
+        }
+
+
+        //2. next is getting all the student
+        // ==> create a function that fetch and display all the students
+        async function fetchAllStudents() {
+            // fetching api from the server
+            const result = await makeRequest('/student/info', 'GET')
+
+            // get access to dom
+            const studentList = document.getElementById('studentList')
+            studentList.innerHTML = ''; //set to empty string
+
+            // calling the result varicable, combined with allStudentInfo ==> which is the data from the server
+            // use for each to display everystudent
+
+            result.allStudentInfo.forEach(student => {
+                //fetching the data from the server
+                const firstName = student.name[0].firstName;
+                const middleName = student.name[0].middleName;
+                const lastName = student.name[0].lastName;
+                const studentId = student.studentId;
+
+                //for displaying the student information create element
+                const studentItem = document.createElement('div');
+                //creating the class name to be able to style it in css
+                studentItem.className = 'student-item';
+                studentItem.innerHTML = `
+                    <h3>
+                        ${lastName},
+                        ${middleName}
+                        ${firstName}
+                        <hr>
+                    </h3>
+                    <p>
+                        Student ID: ${studentId}
+                    </p>
+                `;
+
+                //append the information to be able to display the students
+                studentList.appendChild(studentItem)
+            })
+        }
+
+        //calling the fetchallStudents function
+        fetchAllStudents()
+
+
+
+    </script>
+</body>
+</html>

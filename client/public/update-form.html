@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Update Form</title>
+    <link rel="stylesheet" href="./update-form.css" />
+  </head>
+  <body>
+    <div id="updateSuccessModal" class="modal">
+      <div class="modal-content">
+        <h3>Update Successfully!</h3>
+      </div>
+    </div>
+    <h1>Update Information</h1>
+    <div>
+      <form action="" id="updateForm">
+        <label for="studentId">Student ID:</label>
+        <input type="text" id="studentId" />
+        <label for="firstName">Firstname:</label>
+        <input type="text" id="firstName" readonly />
+        <label for="middleName">Middle Name:</label>
+        <input type="text" id="middleName" />
+        <label for="lastName">Last Name:</label>
+        <input type="text" id="lastName" />
+        <label for="course">Course:</label>
+        <input type="text" id="course" />
+        <label for="yearLevel">Year Level:</label>
+        <input type="text" id="yearLevel" />
+        <label for="classification">Classification:</label>
+        <input type="text" id="classification" />
+        <label for="dateEnrolled">Date Enrolled:</label>
+        <input type="text" id="dateEnrolled" />
+        <label for="dateOfBirth">Date of Birth:</label>
+        <input type="text" id="dateOfBirth" />
+        <label for="placeOfBirth">Place of Birth:</label>
+        <input type="text" id="placeOfBirth" />
+        <label for="age">Age:</label>
+        <input type="text" id="age" />
+        <h5>Gender</h5>
+        <div id="gender">
+          <input type="radio" id="female" name="gender" value="female" />
+          <label for="female">Female</label>
+          <input type="radio" id="male" name="gender" value="male" />
+          <label for="male">Male</label>
+        </div>
+        <button type="submit">Update</button>
+      </form>
+    </div>
+    <div id="return">
+      <button onclick="goBack()">Return</button>
+    </div>
+
+    <script>
+      // Function to make a request using the fetch API
+      async function makeRequest(url, method, data = null) {
+        try {
+          const options = {
+            method,
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          };
+
+          if (data) {
+            options.body = JSON.stringify(data);
+          }
+
+          const response = await fetch(url, options);
+          if (!response.ok) {
+            throw new Error('Request failed');
+          }
+
+          const responseData = await response.json();
+          return responseData;
+        } catch (error) {
+          console.log(error);
+        }
+      }
+
+      // Get input elements
+      const firstNameInput = document.getElementById("firstName");
+      const middleNameInput = document.getElementById("middleName");
+      const lastNameInput = document.getElementById("lastName");
+      const courseInput = document.getElementById("course");
+      const yearLevelInput = document.getElementById("yearLevel");
+      const classificationInput = document.getElementById("classification");
+      const dateEnrolledInput = document.getElementById("dateEnrolled");
+      const dateOfBirthInput = document.getElementById("dateOfBirth");
+      const placeOfBirthInput = document.getElementById("placeOfBirth");
+      const ageInput = document.getElementById("age");
+      const studentIdInput = document.getElementById("studentId");
+      const maleInput = document.getElementById("male");
+      const femaleInput = document.getElementById("female");
+
+      // Retrieve data for the specific student based on their _id
+      const fetchData = async () => {
+        try {
+          const urlParams = new URLSearchParams(window.location.search);
+          const id = urlParams.get("id");
+
+          const response = await makeRequest(`/student/info/${id}`, "GET");
+          const singleStudent = response.singleStudent;
+
+          const name = singleStudent.name[0];
+          firstNameInput.value = name.firstName;
+          middleNameInput.value = name.middleName;
+          lastNameInput.value = name.lastName;
+          courseInput.value = singleStudent.course;
+          yearLevelInput.value = singleStudent.yearLevel;
+          classificationInput.value = singleStudent.classification;
+          dateEnrolledInput.value = new Date(
+            singleStudent.dateEnrolled
+          ).toLocaleDateString("en-US", {
+            month: "long",
+            day: "numeric",
+            year: "numeric",
+          });
+          dateOfBirthInput.value = new Date(
+            singleStudent.dateOfBirth
+          ).toLocaleDateString("en-US", {
+            month: "long",
+            day: "numeric",
+            year: "numeric",
+          });
+          placeOfBirthInput.value = singleStudent.placeOfBirth;
+          ageInput.value = singleStudent.age;
+          studentIdInput.value = singleStudent.studentId;
+          if (singleStudent.gender === "male") {
+            maleInput.checked = true;
+          } else if (singleStudent.gender === "female") {
+            femaleInput.checked = true;
+          }
+        } catch (error) {
+          console.log(error);
+        }
+      };
+
+      fetchData();
+
+      // Function that handles the update form submission
+      document
+        .getElementById("updateForm")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+
+          const urlParams = new URLSearchParams(window.location.search);
+          const id = urlParams.get("id");
+
+          const updateData = {
+            name: {
+              firstName: firstNameInput.value,
+              middleName: middleNameInput.value,
+              lastName: lastNameInput.value,
+            },
+            course: courseInput.value,
+            yearLevel: yearLevelInput.value,
+            classification: classificationInput.value,
+            dateEnrolled: dateEnrolledInput.value,
+            dateOfBirth: dateOfBirthInput.value,
+            placeOfBirth: placeOfBirthInput.value,
+            age: ageInput.value,
+            gender: maleInput.checked ? "male" : "female",
+            studentId: studentIdInput.value,
+          };
+
+          const response = await makeRequest(
+            `/student/info/update/${id}`,
+            "PATCH",
+            { updateData }
+          );
+          console.log(response);
+
+          //display modal
+          const modal = document.getElementById("updateSuccessModal");
+          modal.style.display = "block";
+
+          //wait 3 second
+          setTimeout(() => {
+            modal.style.display = "none";
+
+            // Navigate back
+            goBack();
+          }, 1500);
+        });
+
+      function goBack() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const id = urlParams.get("id");
+        window.location.replace(`student-info.html?id=${id}`);
+      }
+    </script>
+  </body>
+</html>
